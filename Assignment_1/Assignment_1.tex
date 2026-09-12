@@ -1,0 +1,360 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  pdftitle={Diamonds Dataset - Descriptive Statistics},
+  pdfauthor={Christine Donovan},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Diamonds Dataset - Descriptive Statistics}
+\author{Christine Donovan}
+\date{2026-09-12}
+
+\begin{document}
+\maketitle
+
+\section{This is a heading}\label{this-is-a-heading}
+
+This is regular text/narrative.
+
+\subsection{Code Chunk}\label{code-chunk}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# R code goes here}
+\NormalTok{diamonds }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/chrdonovan{-}hub/64060\_cdonova2/main/Assignment\_1/diamonds.csv"}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(diamonds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   carat       cut color clarity depth table price    x    y    z
+## 1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+## 2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+## 3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+## 4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+## 5  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+## 6  0.24 Very Good     J    VVS2  62.8    57   336 3.94 3.96 2.48
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(diamonds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      carat               cut            color          clarity   
+##  Min.   :0.2000   Length   :101   Length   :101   Length   :101  
+##  1st Qu.:0.2400   N.unique :  5   N.unique :  5   N.unique :  6  
+##  Median :0.2600   N.blank  :  0   N.blank  :  0   N.blank  :  0  
+##  Mean   :0.2636   Min.nchar:  4   Min.nchar:  1   Min.nchar:  3  
+##  3rd Qu.:0.3000   Max.nchar:  9   Max.nchar:  1   Max.nchar:  4  
+##  Max.   :0.3200                                                  
+##      depth          table           price             x               y        
+##  Min.   :56.9   Min.   :54.00   Min.   :326.0   Min.   :3.790   Min.   :3.750  
+##  1st Qu.:62.8   1st Qu.:56.00   1st Qu.:354.0   1st Qu.:3.970   1st Qu.:4.010  
+##  Median :63.1   Median :56.00   Median :360.0   Median :4.080   Median :4.100  
+##  Mean   :62.9   Mean   :56.94   Mean   :355.9   Mean   :4.086   Mean   :4.108  
+##  3rd Qu.:63.4   3rd Qu.:57.00   3rd Qu.:362.0   3rd Qu.:4.200   3rd Qu.:4.230  
+##  Max.   :65.1   Max.   :69.00   Max.   :363.0   Max.   :4.380   Max.   :4.460  
+##        z        
+##  Min.   :2.270  
+##  1st Qu.:2.520  
+##  Median :2.590  
+##  Mean   :2.576  
+##  3rd Qu.:2.670  
+##  Max.   :2.810
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(psych)}
+\FunctionTok{describe}\NormalTok{(diamonds[, }\FunctionTok{c}\NormalTok{(}\StringTok{"price"}\NormalTok{, }\StringTok{"carat"}\NormalTok{, }\StringTok{"depth"}\NormalTok{, }\StringTok{"table"}\NormalTok{, }\StringTok{"x"}\NormalTok{, }\StringTok{"y"}\NormalTok{, }\StringTok{"z"}\NormalTok{)])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       vars   n   mean   sd median trimmed  mad    min    max range  skew
+## price    1 101 355.89 9.37 360.00  357.81 4.45 326.00 363.00 37.00 -1.63
+## carat    2 101   0.26 0.03   0.26    0.26 0.04   0.20   0.32  0.12  0.05
+## depth    3 101  62.90 1.15  63.10   63.05 0.44  56.90  65.10  8.20 -2.08
+## table    4 101  56.94 2.26  56.00   56.49 0.00  54.00  69.00 15.00  2.55
+## x        5 101   4.09 0.14   4.08    4.08 0.16   3.79   4.38  0.59  0.27
+## y        6 101   4.11 0.16   4.10    4.11 0.15   3.75   4.46  0.71 -0.07
+## z        7 101   2.58 0.12   2.59    2.58 0.12   2.27   2.81  0.54 -0.46
+##       kurtosis   se
+## price     1.76 0.93
+## carat    -1.13 0.00
+## depth     7.32 0.11
+## table     8.06 0.23
+## x        -0.69 0.01
+## y        -0.41 0.02
+## z        -0.22 0.01
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Cut quality}
+\FunctionTok{table}\NormalTok{(diamonds}\SpecialCharTok{$}\NormalTok{cut)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##      Fair      Good     Ideal   Premium Very Good 
+##        16        45         4        15        21
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Color}
+\FunctionTok{table}\NormalTok{(diamonds}\SpecialCharTok{$}\NormalTok{color)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  E  F  H  I  J 
+## 10  3 24 57  7
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Clarity}
+\FunctionTok{table}\NormalTok{(diamonds}\SpecialCharTok{$}\NormalTok{clarity)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  SI1  SI2  VS1  VS2 VVS1 VVS2 
+##   75   15    4    5    1    1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Install if not already installed}
+\ControlFlowTok{if}\NormalTok{ (}\SpecialCharTok{!}\FunctionTok{require}\NormalTok{(}\StringTok{"psych"}\NormalTok{, }\AttributeTok{quietly =} \ConstantTok{TRUE}\NormalTok{)) \{}
+  \FunctionTok{install.packages}\NormalTok{(}\StringTok{"psych"}\NormalTok{)}
+\NormalTok{\}}
+\FunctionTok{library}\NormalTok{(psych)}
+
+\FunctionTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{diamonds }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(cut) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}
+    \AttributeTok{Count =} \FunctionTok{n}\NormalTok{(),}
+    \AttributeTok{Mean\_Price =} \FunctionTok{mean}\NormalTok{(price),}
+    \AttributeTok{Median\_Price =} \FunctionTok{median}\NormalTok{(price),}
+    \AttributeTok{Std\_Dev =} \FunctionTok{sd}\NormalTok{(price),}
+    \AttributeTok{Min\_Price =} \FunctionTok{min}\NormalTok{(price),}
+    \AttributeTok{Max\_Price =} \FunctionTok{max}\NormalTok{(price)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 7
+##   cut       Count Mean_Price Median_Price Std_Dev Min_Price Max_Price
+##   <chr>     <int>      <dbl>        <dbl>   <dbl>     <int>     <int>
+## 1 Fair         16       358.          359    6.16       337       363
+## 2 Good         45       358.          361    7.70       327       363
+## 3 Ideal         4       340.          342    9.57       326       348
+## 4 Premium      15       353.          357   11.5        326       363
+## 5 Very Good    21       355.          360    9.98       336       363
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{}} \# Box plot of price
+by cut boxplot(diamonds\$price \textasciitilde{} diamonds\$cut, main =
+``Diamond Price by Cut Quality'', xlab = ``Cut'', ylab = ``Price'')
+
+\subsection{Step 4: Run/Test Code
+Chunks}\label{step-4-runtest-code-chunks}
+
+\subsection{Step 5: ``Knit'' Your
+Document}\label{step-5-knit-your-document}
+
+\subsection{Step 6: Customize Output
+(Optional)}\label{step-6-customize-output-optional}
+
+\section{This code runs but output is
+hidden}\label{this-code-runs-but-output-is-hidden}
+
+\section{echo=FALSE hides the code}\label{echofalse-hides-the-code}
+
+\section{warning=FALSE and message=FALSE hide
+warnings/messages}\label{warningfalse-and-messagefalse-hide-warningsmessages}
+
+summary(diamonds)
+
+Or to show code but not output:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# This code is shown but NOT executed}
+\FunctionTok{install.packages}\NormalTok{(}\StringTok{"tidyverse"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Pro Tips:}\label{pro-tips}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Save as you go}: Save your \texttt{.Rmd} file frequently
+  (Ctrl+S)
+\item
+  \textbf{Use headings}: \texttt{\#\ Title}, \texttt{\#\#\ Subtitle},
+  \texttt{\#\#\#\ Sub-subtitle} organize your report
+\item
+  \textbf{Inline code}: Write \texttt{355.8910891} in text to embed R
+  calculations
+\item
+  \textbf{Output formats}: Change \texttt{output:\ html\_document} to
+  \texttt{output:\ pdf\_document} or \texttt{output:\ word\_document} in
+  the header \#\# R Markdown
+\end{itemize}
+
+This is an R Markdown document. Markdown is a simple formatting syntax
+for authoring HTML, PDF, and MS Word documents. For more details on
+using R Markdown see \url{http://rmarkdown.rstudio.com}.
+
+When you click the \textbf{Knit} button a document will be generated
+that includes both content as well as the output of any embedded R code
+chunks within the document. You can embed an R code chunk like this:
+
+\subsection{Including Plots}\label{including-plots}
+
+You can also embed plots, for example:
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_1_files/figure-latex/pressure-1.pdf}}
+
+Note that the \texttt{echo\ =\ FALSE} parameter was added to the code
+chunk to prevent printing of the R code that generated the plot.
+
+\end{document}
