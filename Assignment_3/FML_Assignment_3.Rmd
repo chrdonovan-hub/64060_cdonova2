@@ -1,0 +1,123 @@
+---
+title: "FML_Assignment_3"
+author: "Christine Donovan"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Libraries
+```{r}
+library(e1071)
+library(gmodels)
+library(knitr)
+```
+
+# Load the raw data UniversalBank.csv file
+
+```{r}
+bank<-read.csv("UniversalBank.csv")
+str(bank)
+```
+# Convert to factors
+```{r}
+bank$CreditCard <- factor(bank$CreditCard)
+bank$Online <- factor(bank$Online)
+bank$Personal.Loan <- factor(bank$Personal.Loan)
+str(bank)
+```
+# Partitioning the data into training (60%) and validation (40%) sets.
+```{r}
+set.seed(123)
+train_index <- sample(1:nrow(bank), 0.60 * nrow(bank))
+train_data<-bank[train_index,]
+length(train_index)
+nrow(train_data)
+
+```
+# Partitioning the validation set (40%) All rows except the train_index
+
+```{r}
+validation_data<-bank[-train_index, ]
+nrow(validation_data)
+```
+# Check split
+```{r}
+table(train_data$Personal.Loan)
+```
+278 of 3000 (9.3%) training customers accepted the loan, close to the overall 9.6%.
+
+## Part A: Create pivot table for train_data with Online as a column variable, both CC and Loan as rows.
+```{r}
+ftable(table(CC=train_data$CreditCard, Loan=train_data$Personal.Loan, Online= train_data$Online))
+```
+
+## Part B:  Solve the probability of this customer(owns a bank card & uses online banking) accepting a loan?
+```{r}
+round(57 / 532, 4)
+```
+There is a 10.71% probability, based on the observation that 57 of the 532 customers with CC = 1 and Online = 1 accepted the loan.
+
+
+## Part C:  Create two separate tables for training data.
+
+
+```{r}
+loan_online <- table(Loan = train_data$Personal.Loan, Online = train_data$Online)
+loan_cc     <- table(Loan = train_data$Personal.Loan, CC = train_data$CreditCard)
+
+addmargins(loan_online)
+addmargins(loan_cc)
+```
+
+
+## Part D
+
+```{r}
+p_cc1_loan1     <- loan_cc["1", "1"]         / sum(loan_cc["1", ])
+p_online1_loan1 <- loan_online["1", "1"]     / sum(loan_online["1", ])
+p_loan1         <- sum(loan_cc["1", ])       / sum(loan_cc)
+p_cc1_loan0     <- loan_cc["0", "1"]         / sum(loan_cc["0", ])
+p_online1_loan0 <- loan_online["0", "1"]     / sum(loan_online["0", ])
+p_loan0         <- sum(loan_cc["0", ])       / sum(loan_cc)
+
+kable(round(c(i = p_cc1_loan1, ii = p_online1_loan1, iii = p_loan1,
+        iv = p_cc1_loan0, v = p_online1_loan0, vi = p_loan0), 4), col.names = "Probability")
+```
+
+## Part E:  Compute the naive Bayes probability.
+
+```{r}
+A <- p_cc1_loan1 * p_online1_loan1 * p_loan1
+B <- p_cc1_loan0 * p_online1_loan0 * p_loan0
+
+nb_prob <- A / (A + B)
+round(nb_prob, 4)
+```
+The naive Bayes probability is 11.06%.
+
+
+## Part F: Compare this value with the one obtained in pivot table in part B.
+
+The naive Bayes estimate, 11.06%, is close to the pivot table estimate of 10.71% from Part B. The pivot table estimate is more accurate because it is based on direct observations, whereas naive Bayes assumes that CC and Online are independent within each Loan group. When this assumption is not true, the naive Bayes estimate will fall farther away from the observed count. In this assignment, the naive Bayes estimate is close but not perfect.
+
+
+## Part G Naive Bayes Model
+
+```{r}
+nb_model <- naiveBayes(Personal.Loan ~ Online + CreditCard, data = train_data)
+nb_model
+```
+
+```{r}
+nb_raw <- predict(nb_model, newdata = train_data, type = "raw")
+
+nb_raw[train_data$CreditCard == "1" & train_data$Online == "1", ][1, ]
+```
+
+The Online = 1 column of the Online table, the CC = 1 column of the CreditCard table and the two a-priori probabilities are needed for computing P(Loan = 1 | CC = 1, Online = 1). Interestingly, the model's estimate of 11.06% probability is exactly the same result as Part E. Therefore, the naiveBayes() function used the same formula that was applied manually in the assignment: A ÷ (A + B) from the same six quantities from Part D. 
+
+
