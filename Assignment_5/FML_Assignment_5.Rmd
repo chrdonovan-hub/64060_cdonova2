@@ -1,0 +1,150 @@
+---
+title: "Assignment 5: Hierarchical Clustering of Breakfast Cereals"
+author: "Christine Donovan"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(cluster)
+library(dplyr)
+
+cereals <- read.csv("Cereals.csv")
+cereals <- na.omit(cereals)          # 77 -> 74 cereals
+rownames(cereals) <- cereals$name    # names appear on the dendrogram
+
+cereal_num <- cereals %>%
+  select(calories, protein, fat, sodium, fiber, carbo,
+         sugars, potass, vitamins, weight, cups)
+
+cereal_norm <- scale(cereal_num)     # mean 0, sd 1 for every column
+```
+
+## Question 1:  Comparing the four linkages
+
+```{r}
+methods <- c("single", "complete", "average", "ward")
+ac <- sapply(methods, function(m) agnes(cereal_norm, method = m)$ac)
+round(ac, 4)
+```
+Ward linkage has the highest agglomerative coefficient (0.904), indicating the strongest clustering structure, so I use Ward. Because Ward’s method tends to inflate the AC, I test cluster stability in Question 3.
+
+## Question 2: How many clusters?
+
+```{r, message=FALSE, fig.width=8, fig.height=11}
+
+hc_ward <- agnes(cereal_norm, method = "ward")
+library(factoextra)
+fviz_dend(hc_ward, k = 5, horiz = TRUE, cex = 0.6,
+          rect = TRUE, rect_fill = TRUE,labels_track_height = 5,
+          main = "AGNES Dendrogram (Ward), 5 Clusters", ylab = "Height")
+```
+
+```{r}
+sort(hc_ward$height, decreasing = TRUE)[1:6]
+clusters <- cutree(as.hclust(hc_ward), k = 5)
+table(clusters)
+```
+I chose five clusters. The merge heights jump from 10.5 to 12.7 between five and four clusters, which is the largest gap other than the final split into two groups, and two groups would be too broad to be useful. Cutting the tree at about 11.5 gives five groups:
+
+**High-fiber bran (3):** very high fiber and potassium, lowest calories.
+
+**Hearty muesli/raisin bran (13):** highest calories, fat and serving weight.
+
+**Sugary (21):** highest sugar, lowest fiber and protein.
+
+**Plain whole-grain (25):** low sugar and the lowest sodium.
+
+**Refined corn/rice (12):** highest sodium and vitamins, low fiber.
+
+## Question 3: Cluster structure and stability
+
+To test stability, I randomly split the 74 cereals into two halves, A and B. I clustered A using Ward (k = 5), assigned each cereal in B to the nearest A centroid, and compared those assignments with the clusters from the full data.
+
+```{r}
+set.seed(123)   # makes the random split reproducible
+idx_A <- sample(rownames(cereal_norm), size = 37)
+A <- cereal_norm[idx_A, ]
+B <- cereal_norm[!rownames(cereal_norm) %in% idx_A, ]
+
+# Cluster partition A
+hc_A    <- agnes(A, method = "ward")
+clust_A <- cutree(as.hclust(hc_A), k = 5)
+table(clust_A)
+
+# Centroids of A's clusters (one row per cluster)
+cent_A <- aggregate(A, by = list(cluster = clust_A), FUN = mean)
+cent_A <- as.matrix(cent_A[, -1])
+round(cent_A, 2)
+```
+### Applying partition A's centroids to partition B
+```{r}
+# Assign each B cereal to the nearest A centroid
+assign_B <- apply(B, 1, function(x) which.min(colSums((t(cent_A) - x)^2)))
+
+# Relabel A clusters with the full-data cluster most of their members belong to
+label_map <- tapply(clusters[idx_A], clust_A,
+                    function(v) as.integer(names(which.max(table(v)))))
+label_map
+
+# Compare B's assignments with the full-data clusters
+assign_B_full <- label_map[assign_B]
+full_B <- clusters[rownames(B)]
+table(Full_data = full_B, From_A = assign_B_full)
+mean(assign_B_full == full_B)    # proportion consistent
+```
+86.5% of the B cereals (32 of 37) were placed in the same cluster as in the full-data run. The four larger clusters held up well. The bran cluster did not: all three bran cereals happened to fall in B, so A had no bran cluster and they were assigned to whole-grain. Leaving those three aside, 32 of 34 matched (94%). This shows that small clusters are fragile, which fits hierarchical clustering’s known sensitivity to outliers. Because this result comes from a single random split, a different seed would give a somewhat different percentage.  I would describe the stability as moderate to good.
+
+
+
+## Question 4:  Part 1: Should the data be normalized?
+
+Yes for clustering, but not for judging health. Without normalization, sodium and potassium (in mg with large ranges) would dominate distances. Normalization equalizes the 11 variables but shifts interpretation to relative scales (a negative sugar z-score means “below average,” not “low”). For health goals, better to cluster on relevant variables or weight sugar, fiber, and sodium more, then assess in original units. The table below shows each cluster in grams and milligrams (carbohydrates, weight, and cups were included in clustering but omitted from display).
+
+```{r}
+library(knitr)
+
+profile <- aggregate(cbind(cereal_num, rating = cereals$rating),
+                     by = list(cluster = clusters), FUN = mean)
+profile$n <- as.vector(table(clusters))
+
+profile_tbl <- profile %>%
+  mutate(cluster = c("1 High-fiber bran", "2 Hearty muesli/raisin bran",
+                     "3 Sugary", "4 Plain whole-grain", "5 Refined corn/rice")) %>%
+  select(cluster, n, calories, sugars, fiber, sodium, protein, fat,
+         potass, vitamins, rating)
+
+kable(profile_tbl, digits = 1,
+      col.names = c("Cluster", "n", "Calories", "Sugar (g)", "Fiber (g)",
+                    "Sodium (mg)", "Protein (g)", "Fat (g)",
+                    "Potassium (mg)", "Vitamins (% DV)", "Rating"),
+      caption = "Cluster averages in original units (per serving)")
+```
+
+
+I recommend Cluster 4. Cluster 1 is healthiest on paper, but it has only three cereals, which isn’t enough to offer a different cereal each day, and high-bran cereals are a hard sell to children, who are finicky eaters. Cluster 4 has 25 cereals, the lowest average sodium, low sugar and the second-highest rating. To make sure every cereal in it meets current school standards, I screened Cluster 4 against the USDA limit below.
+
+
+
+## Question 4:  Part 2: screen Cluster 4 against the USDA limit
+
+```{r}
+healthy <- cereals[clusters == 4, ] %>%
+  mutate(sugar_per_oz = sugars / weight) %>%     # weight is in ounces
+  filter(sugar_per_oz <= 6) %>%
+  select(name, sugars, fiber, sodium, protein, calories, rating) %>%
+  arrange(sugars)
+
+nrow(healthy)
+kable(healthy, digits = 1, row.names = FALSE,
+      col.names = c("Cereal", "Sugar (g)", "Fiber (g)", "Sodium (mg)",
+                    "Protein (g)", "Calories", "Rating"),
+      caption = "Cluster 4 cereals meeting the USDA limit (6 g sugar per dry ounce)")
+```
+
+I divide by weight because the USDA rule is per ounce and serving sizes vary from 0.5 to 1.5 oz. My screen is stricter than the USDA rule because the dataset reports total sugars, not added sugars. Since total sugar is always at least as high as added sugar, any cereal that passes my screen also meets the actual USDA rule.
+
